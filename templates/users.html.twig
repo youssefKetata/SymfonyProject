@@ -1,0 +1,26 @@
+{% extends 'template.html.twig' %}
+{% block title %}
+    Users
+{% endblock %}
+
+{% block body %}
+    {% include 'fragments/date.html.twig' %}
+    <table class="table">
+        <tr class="table-active">
+            <td>firstname</td>
+            <td>name</td>
+            <td>age</td>
+            <td>message</td>
+        </tr>
+        {% for user in users %}
+            <tr class="table-{% if loop.index is odd  %}danger{% else %}warning{% endif %}">
+                <td>{{ user.firstname }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.age }}</td>
+                <td>
+                    {{ render(controller('App\\Controller\\FirstController::sayHello',{'firstname':user.firstname,'name':user.name})) }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
