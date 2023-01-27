@@ -37,7 +37,7 @@ class Hobby
         return $this;
     }
 
-    public function __toString(): string
+    public function __toString(): String
     {
         return $this->designation;
     }

@@ -4,9 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Person;
 use App\Form\PersonType;
+use App\Service\Helpers;
+use App\Service\MailerService;
+use App\Service\pdfService;
+use App\Service\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use FontLib\Table\Type\name;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +23,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('person')]
 class PersonController extends AbstractController
 {
+
     #[Route('/', name: 'person.list')]
     public function index(ManagerRegistry $doctrine):Response{
         $repository=$doctrine->getRepository(Person::class);
@@ -44,7 +53,7 @@ class PersonController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'person.delete')]
-    public function deletePerson(ManagerRegistry $doctrine,Person $person=null): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deletePerson(ManagerRegistry $doctrine,Person $person=null): RedirectResponse
     {
         if($person){
             $manager=$doctrine->getManager();
@@ -58,8 +67,8 @@ class PersonController extends AbstractController
     }
 
     #[Route('/edit/{id}/{firstname}/{name}/{age}', name: 'person.edit')]
-    public function editPerson(ManagerRegistry $doctrine, $firstname, $name, $age,Person $person=null): \Symfony\Component\HttpFoundation\RedirectResponse
-    {
+    public function editPerson(ManagerRegistry $doctrine, $firstname, $name, $age,Person $person=null): RedirectResponse
+    {;
         if($person){
             $entityManager=$doctrine->getManager();
             $O_firstname=$person->getFirstname();
@@ -106,7 +115,11 @@ class PersonController extends AbstractController
 
     }
     #[Route('/edit/{id?0}', name: 'person.edit')]
-    public function addPerson(ManagerRegistry $doctrine, Request $request, Person $person=null, SluggerInterface $slugger): Response
+    public function addPerson(ManagerRegistry $doctrine,
+                              Person $person=null,
+                              Request $request,
+                              UploaderService $uploader,
+                              MailerService $mailer ): Response
     {
         $new=false;
         if(!$person){
@@ -122,29 +135,15 @@ class PersonController extends AbstractController
         //mon fomrulaire va allez trairez la requete
         $form->handleRequest($request);
         if($form->isSubmitted() and $form->isValid()){
+            $message = $person->getFirstname().' '.$person->getName().' is a new user';
+            $mailer->sendEmail(text: $message);
             //handle photo upload
-            $photo = $form->get('photo')->getData();
+                $photo = $form->get('photo')->getData();
             // this condition is needed because the 'brochure' field is not required
             // so the PDF file must be processed only when a file is uploaded
             if ($photo) {
-                $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$photo->guessExtension();
-
-                // Move the file to the directory where brochures are stored
-                try {
-                    $photo->move(
-                        $this->getParameter('person_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                }
-
-                // updates the 'brochureFilename' property to store the PDF file name
-                // instead of its contents
-                $person->setImage($newFilename);
+                $directory = $this->getParameter('person_directory');
+                $person->setImage($uploader->uploadFile($photo, $directory));
             }
 
             //verif la donnes to do
@@ -164,5 +163,12 @@ class PersonController extends AbstractController
                 'form'=>$form->createView()
             ]);
         }
+    }
+
+    #[Route('/pdf/{id}', name: 'person.pdf')]
+    public function generatePdfPerson(Person $person=null, pdfService $pdf)
+    {
+        $html = $this->render('person/detail.html.twig', ['person'=>$person]);
+        $pdf->showPdfFile($html);
     }
 }

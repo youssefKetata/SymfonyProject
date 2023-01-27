@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Hobby;
+use App\Entity\Job;
 use App\Entity\Person;
 use App\Entity\Profile;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -25,24 +26,37 @@ class PersonType extends AbstractType
             ->add('createdAt')
             ->add('updatedAt')
             ->add('profile', EntityType::class, [
-                'expanded'=>true,
+                'expanded'=>false,
                 'class'=>Profile::class,
                 'multiple'=>false,
+                'attr'=>[
+                    'class'=>'select2'
+                ]
+
             ])
             ->add('hobbies', EntityType::class, [
                 'expanded'=>false,
                 'class'=>Hobby::class,
                 'multiple'=>true,
-                'required'=>false
+                'required'=>false,
+                'attr'=>[
+                    'class'=>'select2'
+                ]
             ])
-            ->add('job')
+            ->add('job', EntityType::class,[
+                'required'=>false,
+                'class'=>Job::class,
+                'attr' => [
+                    'class' => 'select2'
+                ]
+            ])
             ->add('photo', FileType::class, [
                 'label' => 'Profile image (image file)',
 
                 // unmapped means that this field is not associated to any entity property
                 'mapped' => false,
 
-                // make it optional so you don't have to re-upload the PDF file
+                // make it optional  you don't have to re-upload the PDF file
                 // every time you edit the Product details
                 'required' => false,
 

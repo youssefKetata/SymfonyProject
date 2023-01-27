@@ -1,6 +1,7 @@
 {% extends 'template.html.twig' %}
 
 {% block title %}
+    Person
 
 {% endblock %}
 
@@ -14,3 +15,10 @@
     {{ form_end(form) }}
 {% endblock %}
 
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
+    </script>
+{% endblock %}
