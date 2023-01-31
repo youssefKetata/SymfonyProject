@@ -23,8 +23,16 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\EventListener\PersonListener:
+        tags:
+            - { name: kernel.event_listener, event: person.add }
+            - { name: kernel.event_listener, event: list.all.person }
+            - { name: kernel.event_listener, event: user.login}
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 #    App/Service/MailerService:
 #      arguments:
 #        $replyTo: 'yusufketata5@gmail.com'
+
+

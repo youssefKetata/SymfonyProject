@@ -5,20 +5,22 @@
 {% block body %}
 <div class="row">
     {% for person in persons %}
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">{{ person.id }}.{{ person.name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{ person.firstname}} {{ person.name}} </h6>
-            <p class="card-text">Age: {{ person.age }}</p>
-            <a href="{{ path('person.detail',{'id': person.id }) }}" class="card-link">
-                <i class="fa-solid fa-circle-info"></i></a>
-            <a href="{{ path('person.delete',{'id': person.id }) }}" class="card-link">
-                <i class="fa-solid fa-user-xmark"></i></a>
-            <a href="{{ path('person.edit',{'id': person.id }) }}" class="card-link">
-                <i class="fa-solid fa-user-pen"></i></a>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ person.id }}.{{ person.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ person.firstname}} {{ person.name}} </h6>
+                <p class="card-text">Age: {{ person.age }}</p>
+                <a href="{{ path('person.detail',{'id': person.id }) }}" class="card-link">
+                    <i class="fa-solid fa-circle-info"></i></a>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('person.delete',{'id': person.id }) }}" class="card-link">
+                        <i class="fa-solid fa-user-xmark"></i></a>
+                    <a href="{{ path('person.edit',{'id': person.id }) }}" class="card-link">
+                        <i class="fa-solid fa-user-pen"></i></a>
+                {% endif %}
 
+            </div>
         </div>
-    </div>
     {% endfor %}
 
 

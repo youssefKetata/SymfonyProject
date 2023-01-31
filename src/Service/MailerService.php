@@ -12,7 +12,7 @@ use function PHPUnit\Framework\throwException;
 class MailerService
 {
     private $replyTo;
-    public function __construct(TransportInterface $transport, private MailerInterface $mailer, $replyTo){
+    public function __construct(TransportInterface $transport, private readonly MailerInterface $mailer, $replyTo){
 
         $this->replyTo = $replyTo;
 
@@ -35,9 +35,8 @@ class MailerService
 
         try {
             $this->mailer->send($mail);
-//            throw new \Exception('yes') ;
         } catch (TransportExceptionInterface $e) {
-//            throw new \Exception($e->getMessage());
+            throw new \Exception('failed sending email');
         }
     }
 

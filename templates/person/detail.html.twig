@@ -4,11 +4,11 @@
     <div class="alert/alert-success">
 
 {{ person.firstname  }} {{ person.name }} is {{ person.age }}
-        person job :{{ person.job.designation }}
-       peron profile: {{ person.profile.rs }}
-        {{ person.profile.url }}
-        {{ person.hobbies.count }}
+{% if app.user %}
+        <p>Created By: {{ app.user.email }}</p>
+        {% endif %}
     </div>
+
 
 {% endblock %}
 

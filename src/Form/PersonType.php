@@ -27,6 +27,7 @@ class PersonType extends AbstractType
             ->add('updatedAt')
             ->add('profile', EntityType::class, [
                 'expanded'=>false,
+                'required'=>false,
                 'class'=>Profile::class,
                 'multiple'=>false,
                 'attr'=>[
