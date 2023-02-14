@@ -35,7 +35,6 @@ class UserFixture extends Fixture implements FixtureGroupInterface
             $manager->persist($user);
 
         }
-
         $manager->flush();
     }
 
